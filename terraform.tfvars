@@ -1,5 +1,5 @@
 subscriptionID = "52786f9b-ef27-4af0-9bfd-1cb55e828c18"
-resourceGroupName = "WIN-AUDIT"
+resourceGroupName = "APwinaudit"
 location = "southeastasia"
 securityGroup = "auditSG"
 virtualNetwork = "VNaudit"
