@@ -13,8 +13,8 @@ resource "azurerm_resource_group" "auditRG" {
 #Create Network Security Group
 resource "azurerm_network_security_group" "auditSG" {
   name                = var.securityGroup
-  location            = var.location
-  resource_group_name = var.resourceGroupName
+  location            = "${azurerm_resource_group.auditRG.location}"
+  resource_group_name = "${azurerm_resource_group.auditRG.name}"
 }
 
 #Create Rule to Allow RDP Inbound
@@ -28,24 +28,24 @@ resource "azurerm_network_security_rule" "rdp" {
   destination_port_range      = "3389"
   source_address_prefix       = "*"
   destination_address_prefix  = "*"
-  resource_group_name         = var.resourceGroupName
-  network_security_group_name = var.securityGroup
+  resource_group_name         = "${azurerm_resource_group.auditRG.name}"
+  network_security_group_name = azurerm_network_security_group.auditSG.name
 }
 
 #Create VN within RG
 resource "azurerm_virtual_network" "auditVN" {
   name                  = var.virtualNetwork
   address_space         = ["10.0.0.0/16"]
-  location              = var.location
-  resource_group_name   = var.resourceGroupName
+  location              = "${azurerm_resource_group.auditRG.location}"
+  resource_group_name   = "${azurerm_resource_group.auditRG.name}"
 }
 
 #Create Subnets
 resource "azurerm_subnet" "subnet-1" {
   name                  = "audit-subnet-1"
-  resource_group_name   = var.resourceGroupName
-  virtual_network_name  = var.virtualNetwork
-  address_prefix        = "10.0.1.0/24"
+  resource_group_name   = "${azurerm_resource_group.auditRG.name}"
+  virtual_network_name  = azurerm_virtual_network.auditVN.name
+  address_prefixes        = "10.0.1.0/24"
 }
 
 #Associate Subnet with NSG
@@ -57,16 +57,16 @@ resource "azurerm_subnet_network_security_group_association" "test" {
 #Create Public IP
 resource "azurerm_public_ip" "dataip" {
   name                          = "testPublicIP"
-  location                      = var.location
-  resource_group_name           = var.resourceGroupName
+  location                      = "${azurerm_resource_group.auditRG.location}"
+  resource_group_name           = "${azurerm_resource_group.auditRG.name}"
   allocation_method             = "Dynamic"
 }
 
 #Create Network Interface
 resource "azurerm_network_interface" "vm_interface" {
   name                  = "vm_NIC"
-  location              = var.location
-  resource_group_name   = var.resourceGroupName
+  location              = "${azurerm_resource_group.auditRG.location}"
+  resource_group_name   = "${azurerm_resource_group.auditRG.name}"
   ip_configuration {
     name                            = "Server2019"
     subnet_id                       = "${azurerm_subnet.subnet-1.id}"
@@ -78,8 +78,8 @@ resource "azurerm_network_interface" "vm_interface" {
 #Create a VM
 resource "azurerm_virtual_machine" "windows" {
   name                              = "APWindows"
-  location                          = var.location
-  resource_group_name               = var.resourceGroupName
+  location                          = "${azurerm_resource_group.auditRG.location}"
+  resource_group_name               = "${azurerm_resource_group.auditRG.name}"
   network_interface_ids             = ["${azurerm_network_interface.vm_interface.id}"]
   vm_size                           = "Standard_DS1_v2"
   delete_os_disk_on_termination     = "true"
@@ -118,7 +118,7 @@ resource "azurerm_virtual_machine" "windows" {
 #Retrieve Public IP
 data "azurerm_public_ip" "test" {
   name = "${azurerm_public_ip.dataip.name}"
-  resource_group_name = var.resourceGroupName
+  resource_group_name = "${azurerm_resource_group.auditRG.name}"
   depends_on = [azurerm_virtual_machine.windows]
 }
 output "public_ip_address" {
