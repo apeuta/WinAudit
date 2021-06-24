@@ -56,7 +56,7 @@ resource "azurerm_subnet_network_security_group_association" "test" {
 
 #Create Public IP
 resource "azurerm_public_ip" "dataip" {
-  name                          = "testPublicIP"
+  name                          = "ASWPublicIP"
   location                      = "${azurerm_resource_group.auditRG.location}"
   resource_group_name           = "${azurerm_resource_group.auditRG.name}"
   allocation_method             = "Dynamic"
@@ -64,7 +64,7 @@ resource "azurerm_public_ip" "dataip" {
 
 #Create Network Interface
 resource "azurerm_network_interface" "vm_interface" {
-  name                  = "vm_NIC"
+  name                  = "asw_NIC"
   location              = "${azurerm_resource_group.auditRG.location}"
   resource_group_name   = "${azurerm_resource_group.auditRG.name}"
   ip_configuration {
@@ -100,7 +100,7 @@ resource "azurerm_virtual_machine" "windows" {
   }
 
   os_profile {
-    computer_name = "AdvWinServer2019"
+    computer_name = "ASWinServer19"
     admin_username = var.vm_admin
     admin_password = var.vm_pass
   }
