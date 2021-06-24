@@ -23,6 +23,16 @@ variable "virtualNetwork" {
     description = "name of virtualNetwork"
 }
 
+variable "disk_name" {
+    type = string
+    description = "disk name"
+}
+
+variable "vm_name" {
+    type = string
+    description = "vm name"
+}
+
 variable "image_publisher" {
     type = string
     description = "name of vim publisher"

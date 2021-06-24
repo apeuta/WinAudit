@@ -42,7 +42,7 @@ resource "azurerm_virtual_network" "auditVN" {
 
 #Create Subnets
 resource "azurerm_subnet" "subnet-1" {
-  name                  = "audit-subnet-1"
+  name                  = "advswin-subnet-1"
   resource_group_name   = "${azurerm_resource_group.auditRG.name}"
   virtual_network_name  = azurerm_virtual_network.auditVN.name
   address_prefix        = "10.0.1.0/24"
@@ -77,7 +77,7 @@ resource "azurerm_network_interface" "vm_interface" {
 
 #Create a VM
 resource "azurerm_virtual_machine" "windows" {
-  name                              = "APWindows"
+  name                              = var.vm_name
   location                          = "${azurerm_resource_group.auditRG.location}"
   resource_group_name               = "${azurerm_resource_group.auditRG.name}"
   network_interface_ids             = ["${azurerm_network_interface.vm_interface.id}"]
@@ -93,14 +93,14 @@ resource "azurerm_virtual_machine" "windows" {
   }
 
   storage_os_disk {
-    name = "disk4APWindows"
+    name = var.disk_name
     caching = "ReadWrite"
     create_option = "FromImage"
     managed_disk_type = "Standard_LRS"
   }
 
   os_profile {
-    computer_name = "APserver2019"
+    computer_name = "AdvWinServer2019"
     admin_username = var.vm_admin
     admin_password = var.vm_pass
   }
